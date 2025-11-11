@@ -2,6 +2,7 @@ package com.dev.lotar.crud_de_clientes.controllers;
 
 import com.dev.lotar.crud_de_clientes.dto.ClientDTO;
 import com.dev.lotar.crud_de_clientes.services.ClientService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -41,14 +42,9 @@ public class ClientController {
   }
 
   @PostMapping
-  public ResponseEntity<ClientDTO> insert(@RequestBody ClientDTO clientDTO) {
+  public ResponseEntity<ClientDTO> insert(@Valid @RequestBody ClientDTO clientDTO) {
     clientDTO = clientService.insert(clientDTO);
 
-    //Decomposição:
-    //ServletUriComponentsBuilder.fromCurrentRequest() - Obtém a URI da requisição atual (ex: http://localhost:8080/clients)
-    //.path("/{id}") - Adiciona o path template /{id} à URI (ex: http://localhost:8080/clients/{id})
-    //.buildAndExpand(clientDTO.getId()) - Substitui {id} pelo ID real do cliente criado (ex: http://localhost:8080/clients/123)
-    //.toUri() - Converte para objeto URI
     URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
         .buildAndExpand(clientDTO.getId()).toUri();
 
@@ -56,14 +52,14 @@ public class ClientController {
   }
 
   @PutMapping(value = "/{id}")
-  public ResponseEntity<ClientDTO> update(@PathVariable Long id , @RequestBody ClientDTO clientDTO) {
+  public ResponseEntity<ClientDTO> update(@Valid @PathVariable Long id , @RequestBody ClientDTO clientDTO) {
     clientDTO = clientService.update(id, clientDTO);
 
     return ResponseEntity.ok(clientDTO);
   }
 
   @DeleteMapping(value = "/{id}")
-  public ResponseEntity<Void> delete (@PathVariable Long id){
+  public ResponseEntity<Void> delete (@Valid @PathVariable Long id){
     clientService.delete(id);
     return ResponseEntity.noContent().build();
   }
