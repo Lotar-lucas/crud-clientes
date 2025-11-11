@@ -1,6 +1,8 @@
 package com.dev.lotar.crud_de_clientes.dto;
 
 import com.dev.lotar.crud_de_clientes.entities.Client;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
 
 import java.time.LocalDate;
 
@@ -8,12 +10,14 @@ public class ClientDTO {
 
   private Long id;
 
+  @NotBlank(message = "Field name is required")
   private String name;
 
   private String cpf;
 
   private Double income;
 
+  @PastOrPresent(message = "Field birthDate cannot be in the future or past")
   private LocalDate birthDate;
 
   private Integer children;

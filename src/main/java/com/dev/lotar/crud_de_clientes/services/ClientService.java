@@ -3,6 +3,7 @@ package com.dev.lotar.crud_de_clientes.services;
 import com.dev.lotar.crud_de_clientes.dto.ClientDTO;
 import com.dev.lotar.crud_de_clientes.entities.Client;
 import com.dev.lotar.crud_de_clientes.repositories.ClientRepository;
+import com.dev.lotar.crud_de_clientes.services.exceptions.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,8 +29,7 @@ public class ClientService {
   @Transactional(readOnly = true)
   public ClientDTO findById(Long id) {
     Client client = clientRepository.findById(id).orElseThrow(
-      // Todo -  tratar erro de not found
-      () -> new RuntimeException("Client not found")
+      () -> new ResourceNotFoundException("Client not found")
     );
     return new ClientDTO(client);
   }
@@ -57,23 +57,15 @@ public class ClientService {
       entity = clientRepository.save(entity);
       return new ClientDTO(entity);
     } catch (Exception e) {
-      //Todo tratar Exception mais especifica
-      throw new RuntimeException("Client not found");
+      throw new ResourceNotFoundException("Client not found");
     }
   }
 
   public void delete(Long id){
-    if (clientRepository.existsById(id)) {
-      //tratar exception de not found
-//      throw new RuntimeException("Client not found");
+    if (!clientRepository.existsById(id)) {
+      throw new ResourceNotFoundException("Client not found");
     }
 
-    try {
-      clientRepository.deleteById(id);
-    }catch (Exception e){
-      //tratar exception de integridade referencial
-    }
+    clientRepository.deleteById(id);
   }
-
-
 }
