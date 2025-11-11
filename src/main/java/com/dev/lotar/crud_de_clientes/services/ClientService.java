@@ -17,8 +17,16 @@ public class ClientService {
     this.clientRepository = clientRepository;
   }
 
+  private void copyDtoToEntity (ClientDTO clientDTO, Client entity) {
+    entity.setName(clientDTO.getName());
+    entity.setCpf(clientDTO.getCpf());
+    entity.setIncome(clientDTO.getIncome());
+    entity.setBirthDate(clientDTO.getBirthDate());
+    entity.setChildren(clientDTO.getChildren());
+  }
+
   @Transactional(readOnly = true)
-  public ClientDTO findById (Long id) {
+  public ClientDTO findById(Long id) {
     Client client = clientRepository.findById(id).orElseThrow(
       // Todo -  tratar erro de not found
       () -> new RuntimeException("Client not found")
@@ -27,24 +35,45 @@ public class ClientService {
   }
 
   @Transactional(readOnly = true)
-  public Page<ClientDTO> findAll (Pageable pageable) {
+  public Page<ClientDTO> findAll(Pageable pageable) {
     Page<Client> clients = clientRepository.findAll(pageable);
     return clients.map(ClientDTO::new);
   }
 
   @Transactional
-  public ClientDTO insert (ClientDTO clientDTO) {
+  public ClientDTO insert(ClientDTO clientDTO) {
     Client client = new Client();
     copyDtoToEntity(clientDTO, client);
     client = clientRepository.save(client);
     return new ClientDTO(client);
   }
 
-  private void copyDtoToEntity (ClientDTO clientDTO, Client entity) {
-    entity.setName(clientDTO.getName());
-    entity.setCpf(clientDTO.getCpf());
-    entity.setIncome(clientDTO.getIncome());
-    entity.setBirthDate(clientDTO.getBirthDate());
-    entity.setChildren(clientDTO.getChildren());
+  @Transactional
+  public ClientDTO update(Long id, ClientDTO clientDTO) {
+
+    try {
+      Client entity = clientRepository.getReferenceById(id);
+      copyDtoToEntity(clientDTO, entity);
+      entity = clientRepository.save(entity);
+      return new ClientDTO(entity);
+    } catch (Exception e) {
+      //Todo tratar Exception mais especifica
+      throw new RuntimeException("Client not found");
+    }
   }
+
+  public void delete(Long id){
+    if (clientRepository.existsById(id)) {
+      //tratar exception de not found
+//      throw new RuntimeException("Client not found");
+    }
+
+    try {
+      clientRepository.deleteById(id);
+    }catch (Exception e){
+      //tratar exception de integridade referencial
+    }
+  }
+
+
 }
