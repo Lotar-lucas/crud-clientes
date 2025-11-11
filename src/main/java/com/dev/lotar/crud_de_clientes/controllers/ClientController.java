@@ -45,11 +45,6 @@ public class ClientController {
   public ResponseEntity<ClientDTO> insert(@Valid @RequestBody ClientDTO clientDTO) {
     clientDTO = clientService.insert(clientDTO);
 
-    //Decomposição:
-    //ServletUriComponentsBuilder.fromCurrentRequest() - Obtém a URI da requisição atual (ex: http://localhost:8080/clients)
-    //.path("/{id}") - Adiciona o path template /{id} à URI (ex: http://localhost:8080/clients/{id})
-    //.buildAndExpand(clientDTO.getId()) - Substitui {id} pelo ID real do cliente criado (ex: http://localhost:8080/clients/123)
-    //.toUri() - Converte para objeto URI
     URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
         .buildAndExpand(clientDTO.getId()).toUri();
 
